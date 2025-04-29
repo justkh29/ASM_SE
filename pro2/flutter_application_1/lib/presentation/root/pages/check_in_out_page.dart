@@ -169,16 +169,23 @@ class _CheckInOutPageState extends State<CheckInOutPage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {},
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
-      ),
+  backgroundColor: Colors.blue,
+  selectedItemColor: Colors.white,
+  unselectedItemColor: Colors.white70,
+  // currentIndex: -1, // Trick để không làm nổi bật item nào
+  // onTap: (index) {},
+  items: const [
+    BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: ''),
+    BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: ''),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.home, size:  40), // <-- Tăng kích thước ở đây
+      label: '',
+    ),
+    BottomNavigationBarItem(icon: Icon(Icons.star), label: ''),
+    BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+  ],
+  type: BottomNavigationBarType.fixed, // Đảm bảo các icon hiển thị đầy đủ
+),
     );
   }
 }

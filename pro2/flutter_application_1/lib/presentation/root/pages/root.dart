@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'room_auth_page.dart'; // thêm import mới
+import 'room_auth_page.dart';
 import 'choose_room.dart';
 import 'booking_history_page.dart';
 import 'check_in_out_page.dart';
+import 'package:flutter_application_1/presentation/choose_mode/pages/choose_mode.dart';
+
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
 
@@ -12,8 +14,8 @@ class RootPage extends StatelessWidget {
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children: const [
-            DrawerHeader(
+          children: [
+            const DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
               child: Text(
                 'Menu',
@@ -23,13 +25,20 @@ class RootPage extends StatelessWidget {
                 ),
               ),
             ),
-            ListTile(
+            const ListTile(
               leading: Icon(Icons.settings),
               title: Text('Cài đặt'),
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Đăng xuất'),
+              leading: const Icon(Icons.logout),
+              title: const Text('Đăng xuất'),
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                  (route) => false,
+                );
+              },
             ),
           ],
         ),
@@ -43,17 +52,15 @@ class RootPage extends StatelessWidget {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: const Text('Trang Chủ'),
+        title: const Text('Home'),
         centerTitle: true,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: GestureDetector(
-              onTap: () {
-                // mở trang thông tin cá nhân chẳng hạn
-              },
+              onTap: () {},
               child: const CircleAvatar(
-                backgroundImage: AssetImage('assets/images/avatar.png'), // ảnh đại diện
+                backgroundImage: AssetImage('assets/images/avatar.png'),
                 radius: 19,
               ),
             ),
@@ -61,28 +68,26 @@ class RootPage extends StatelessWidget {
         ],
       ),
       body: Stack(
-  children: [
-    // Ảnh nền chiếm nửa màn hình
-    Positioned.fill(
-      child: Align(
-        alignment: Alignment.topCenter, // Căn giữa ảnh nền
-        child: Container(
-          height: MediaQuery.of(context).size.height / 3,  // Chiếm nửa chiều cao màn hình
-          width: MediaQuery.of(context).size.width,  // Chiếm toàn bộ chiều rộng màn hình
-          child: Image.asset(
-            'assets/images/background.png',
-            fit: BoxFit.cover,
+        children: [
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                height: MediaQuery.of(context).size.height / 3,
+                width: MediaQuery.of(context).size.width,
+                child: Image.asset(
+                  'assets/images/background.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
-    ),
-    // Nội dung chính
           Center(
             child: Container(
-              margin: const EdgeInsets.all(16.0),
-              padding: const EdgeInsets.all(16.0),
+              margin: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
+                color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -93,7 +98,8 @@ class RootPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Chooseroom()),
+                          builder: (context) => const Chooseroom(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.add_home),
@@ -105,7 +111,8 @@ class RootPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const BookingHistoryPage()),
+                          builder: (context) => const BookingHistoryPage(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.history),
@@ -117,7 +124,8 @@ class RootPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const CheckInOutPage()),
+                          builder: (context) => const CheckInOutPage(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.meeting_room),
@@ -129,7 +137,8 @@ class RootPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const RoomAuthPage()),
+                          builder: (context) => const RoomAuthPage(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.manage_accounts),
@@ -141,19 +150,25 @@ class RootPage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {
-          // xử lý điều hướng tại đây nếu cần
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'Thông báo'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), label: 'Tài khoản'),
-        ],
-      ),
+bottomNavigationBar: BottomNavigationBar(
+  backgroundColor: Colors.blue,
+  selectedItemColor: Colors.white,
+  unselectedItemColor: Colors.white70,
+  // currentIndex: -1, // Trick để không làm nổi bật item nào
+  // onTap: (index) {},
+  items: const [
+    BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: ''),
+    BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: ''),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.home, size:  40), // <-- Tăng kích thước ở đây
+      label: '',
+    ),
+    BottomNavigationBarItem(icon: Icon(Icons.star), label: ''),
+    BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+  ],
+  type: BottomNavigationBarType.fixed, // Đảm bảo các icon hiển thị đầy đủ
+),
+
     );
   }
 }

@@ -35,60 +35,104 @@ class RoomManagementPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.blue[900],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
               children: [
-                FilterButton(icon: Icons.location_city, label: 'Mã tòa'),
-                FilterButton(icon: Icons.calendar_today, label: 'Ngày đến'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Mã toà',
+                          labelStyle: const TextStyle(color: Colors.black),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Ngày đến',
+                          labelStyle: const TextStyle(color: Colors.black),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          suffixIcon: const Icon(Icons.calendar_today),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.yellow,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 15,
+                    ),
+                  ),
+                  child: const Text(
+                    'Tìm kiếm',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.search),
-              label: const Text('Tìm kiếm'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: const [
+                RoomCard(
+                  roomCode: 'BK.B1 109',
+                  date: '02/04/2025',
+                  duration: 180,
+                  people: 8,
+                  statusColor: Colors.green,
                 ),
-              ),
+                RoomCard(
+                  roomCode: 'BK.B2 102',
+                  date: '19/04/2025',
+                  duration: 180,
+                  people: 8,
+                  statusColor: Colors.orange,
+                ),
+                RoomCard(
+                  roomCode: 'BK.B3 206',
+                  date: '02/04/2025',
+                  duration: 180,
+                  people: 8,
+                  statusColor: Colors.orange,
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView(
-                children: const [
-                  RoomCard(
-                    roomCode: 'BK.B1 109',
-                    date: '02/04/2025',
-                    duration: 180,
-                    people: 8,
-                    statusColor: Colors.green,
-                  ),
-                  RoomCard(
-                    roomCode: 'BK.B2 102',
-                    date: '19/04/2025',
-                    duration: 180,
-                    people: 8,
-                    statusColor: Colors.orange,
-                  ),
-                  RoomCard(
-                    roomCode: 'BK.B3 206',
-                    date: '02/04/2025',
-                    duration: 180,
-                    people: 8,
-                    statusColor: Colors.orange,
-                  ),
-                ],
-              ),
-            ),
-            const Row(
+          ),
+          const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 StatusIndicator(color: Colors.green, text: 'Đang trong thời gian nhận phòng'),
@@ -96,55 +140,21 @@ class RoomManagementPage extends StatelessWidget {
                 StatusIndicator(color: Colors.orange, text: 'Chưa đến thời gian nhận phòng'),
               ],
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {},
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
           ),
         ],
       ),
-    );
-  }
-}
-
-class FilterButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const FilterButton({required this.icon, required this.label, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: () {},
-      icon: Icon(icon),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF0A3D91),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.blue, 
+        selectedItemColor: Colors.white,
+        currentIndex: 0,
+        onTap: (index) {},
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        ],
       ),
     );
   }
@@ -170,6 +180,9 @@ class RoomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(

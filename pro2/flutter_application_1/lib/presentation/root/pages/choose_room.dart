@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'root.dart';
+import 'building_overview_page.dart';
 
 class Chooseroom extends StatefulWidget {
   const Chooseroom({super.key});
@@ -27,7 +28,7 @@ class _ChooseroomState extends State<Chooseroom> {
   @override
   void initState() {
     super.initState();
-    filteredRooms = List.from(availableRooms); // Initially show all rooms
+    filteredRooms = List.from(availableRooms);
   }
 
   void _searchRooms() {
@@ -105,7 +106,7 @@ class _ChooseroomState extends State<Chooseroom> {
                         controller: _buildingCodeController,
                         decoration: InputDecoration(
                           labelText: 'Mã toà',
-                          labelStyle: const TextStyle(color: Colors.white),
+                          labelStyle: const TextStyle(color: Colors.black),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -120,7 +121,7 @@ class _ChooseroomState extends State<Chooseroom> {
                         controller: _dateController,
                         decoration: InputDecoration(
                           labelText: 'Ngày đến',
-                          labelStyle: const TextStyle(color: Colors.white),
+                          labelStyle: const TextStyle(color: Colors.black),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -140,7 +141,7 @@ class _ChooseroomState extends State<Chooseroom> {
                         controller: _peopleController,
                         decoration: InputDecoration(
                           labelText: 'Số người',
-                          labelStyle: const TextStyle(color: Colors.white),
+                          labelStyle: const TextStyle(color: Colors.black),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -155,7 +156,7 @@ class _ChooseroomState extends State<Chooseroom> {
                         controller: _durationController,
                         decoration: InputDecoration(
                           labelText: 'Thời gian sử dụng',
-                          labelStyle: const TextStyle(color: Colors.white),
+                          labelStyle: const TextStyle(color: Colors.black),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -197,17 +198,32 @@ class _ChooseroomState extends State<Chooseroom> {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               children: List.generate(filteredRooms.length, (index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.yellow,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Text(
-                      filteredRooms[index],
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BuildingOverviewPage(
+                          buildingCode: filteredRooms[index],
+                          date: _dateController.text,
+                          people: int.tryParse(_peopleController.text) ?? 0,
+                          duration: int.tryParse(_durationController.text) ?? 0,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.yellow,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        filteredRooms[index],
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -218,30 +234,20 @@ class _ChooseroomState extends State<Chooseroom> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {},
+        backgroundColor: Colors.blue,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: ''),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
+            icon: Icon(Icons.home, size: 40),
             label: '',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.star), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }
