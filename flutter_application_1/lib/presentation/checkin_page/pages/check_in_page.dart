@@ -66,7 +66,6 @@
 //       return;
 //     }
 
-//     // Điều hướng đến trang nhập mã với mã đã có
 //     Navigator.push(
 //       context,
 //       MaterialPageRoute(
@@ -113,44 +112,124 @@
 //       body: _isLoading
 //           ? const Center(child: CircularProgressIndicator())
 //           : _confirmedBookings.isEmpty
-//               ? const Center(child: Text('Không có đặt phòng nào đã được xác nhận.'))
+//               ? Center(
+//                   child: Column(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       const Icon(
+//                         Icons.event_busy,
+//                         size: 64,
+//                         color: Colors.grey,
+//                       ),
+//                       const SizedBox(height: 16),
+//                       const Text(
+//                         'Không có đặt phòng nào đã được xác nhận.',
+//                         style: TextStyle(fontSize: 16),
+//                       ),
+//                       const SizedBox(height: 24),
+//                       ElevatedButton(
+//                         style: ElevatedButton.styleFrom(
+//                           backgroundColor: Colors.amber,
+//                           foregroundColor: Colors.black,
+//                           padding: const EdgeInsets.symmetric(
+//                               horizontal: 24, vertical: 12),
+//                         ),
+//                         onPressed: () {
+//                           Navigator.pushReplacement(
+//                             context,
+//                             MaterialPageRoute(builder: (context) => const RootPage()),
+//                           );
+//                         },
+//                         child: const Text('Đặt phòng ngay'),
+//                       ),
+//                     ],
+//                   ),
+//                 )
 //               : ListView.builder(
-//                   padding: const EdgeInsets.all(20.0),
+//                   padding: const EdgeInsets.all(16),
 //                   itemCount: _confirmedBookings.length,
 //                   itemBuilder: (context, index) {
 //                     final booking = _confirmedBookings[index];
 //                     return Card(
+//                       elevation: 3,
 //                       margin: const EdgeInsets.only(bottom: 16),
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(12),
+//                         side: const BorderSide(color: Colors.blue, width: 1),
+//                       ),
 //                       child: Padding(
 //                         padding: const EdgeInsets.all(16.0),
 //                         child: Column(
 //                           crossAxisAlignment: CrossAxisAlignment.start,
 //                           children: [
-//                             Text(
-//                               '${booking.buildingCode} ${booking.roomNumber}',
-//                               style: const TextStyle(
-//                                 fontWeight: FontWeight.bold,
-//                                 fontSize: 18,
-//                               ),
-//                             ),
-//                             const SizedBox(height: 8),
-//                             Text(
-//                               'Ngày: ${DateFormat('dd/MM/yyyy').format(booking.bookingDate)}',
-//                             ),
-//                             Text('Bắt đầu: ${booking.startTime.format(context)}'),
-//                             Text('Thời lượng: ${booking.duration} giờ'),
-//                             Text('Số người: ${booking.numberOfPeople}'),
-//                             const SizedBox(height: 16),
-//                             ElevatedButton(
-//                               onPressed: () => _handleCheckIn(booking),
-//                               style: ElevatedButton.styleFrom(
-//                                 backgroundColor: Colors.green,
-//                                 foregroundColor: Colors.white,
-//                                 shape: RoundedRectangleBorder(
-//                                   borderRadius: BorderRadius.circular(10),
+//                             Row(
+//                               children: [
+//                                 Container(
+//                                   padding: const EdgeInsets.symmetric(
+//                                       horizontal: 12, vertical: 6),
+//                                   decoration: BoxDecoration(
+//                                     color: Colors.amber,
+//                                     borderRadius: BorderRadius.circular(20),
+//                                   ),
+//                                   child: Text(
+//                                     booking.roomNumber,
+//                                     style: const TextStyle(
+//                                       fontWeight: FontWeight.bold,
+//                                     ),
+//                                   ),
 //                                 ),
-//                               ),
-//                               child: const Text('Xác nhận nhận phòng'),
+//                                 const SizedBox(width: 12),
+//                                 Text(
+//                                   'Tòa ${booking.buildingCode}',
+//                                   style: const TextStyle(
+//                                     fontSize: 16,
+//                                     fontWeight: FontWeight.w500,
+//                                   ),
+//                                 ),
+//                                 const Spacer(),
+//                                 Container(
+//                                   padding: const EdgeInsets.symmetric(
+//                                       horizontal: 8, vertical: 4),
+//                                   decoration: BoxDecoration(
+//                                     color: Colors.blue,
+//                                     borderRadius: BorderRadius.circular(4),
+//                                   ),
+//                                   child: const Text(
+//                                     'Đã xác nhận',
+//                                     style: TextStyle(
+//                                       color: Colors.white,
+//                                       fontSize: 12,
+//                                       fontWeight: FontWeight.bold,
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                             const SizedBox(height: 12),
+//                             const Divider(),
+//                             const SizedBox(height: 8),
+//                             _buildInfoRow('Ngày:',
+//                                 DateFormat('dd/MM/yyyy').format(booking.bookingDate)),
+//                             _buildInfoRow('Thời gian:',
+//                                 '${booking.startTime.format(context)} - ${booking.endTime.format(context)}'),
+//                             _buildInfoRow('Thời lượng:', '${booking.duration} giờ'),
+//                             _buildInfoRow('Số người:', '${booking.numberOfPeople}'),
+//                             const SizedBox(height: 16),
+//                             Row(
+//                               mainAxisAlignment: MainAxisAlignment.end,
+//                               children: [
+//                                 ElevatedButton(
+//                                   onPressed: () => _handleCheckIn(booking),
+//                                   style: ElevatedButton.styleFrom(
+//                                     backgroundColor: Colors.green,
+//                                     foregroundColor: Colors.white,
+//                                     shape: RoundedRectangleBorder(
+//                                       borderRadius: BorderRadius.circular(8),
+//                                     ),
+//                                   ),
+//                                   child: const Text('Xác nhận nhận phòng'),
+//                                 ),
+//                               ],
 //                             ),
 //                           ],
 //                         ),
@@ -212,6 +291,33 @@
 //       ),
 //     );
 //   }
+
+//   Widget _buildInfoRow(String label, String value, [Color? valueColor]) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 8.0),
+//       child: Row(
+//         children: [
+//           Text(
+//             label,
+//             style: TextStyle(
+//               color: Colors.grey[700],
+//               fontWeight: FontWeight.w500,
+//             ),
+//           ),
+//           const SizedBox(width: 8),
+//           Expanded(
+//             child: Text(
+//               value,
+//               style: TextStyle(
+//                 fontWeight: FontWeight.bold,
+//                 color: valueColor ?? Colors.black,
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
 // }
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -236,7 +342,7 @@ class CheckInPage extends StatefulWidget {
 class _CheckInPageState extends State<CheckInPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = true;
-  List<BookingRequest> _confirmedBookings = [];
+  List<BookingRequest> _bookings = [];
 
   @override
   void initState() {
@@ -260,11 +366,11 @@ class _CheckInPageState extends State<CheckInPage> {
     final snapshot = await FirebaseFirestore.instance
         .collection('bookings')
         .where('userId', isEqualTo: currentUser.uid)
-        .where('status', isEqualTo: 'confirmed')
+        .where('status', whereIn: ['confirmed', 'checked_in']) // Lấy cả confirmed và checked_in
         .get();
 
     setState(() {
-      _confirmedBookings = snapshot.docs
+      _bookings = snapshot.docs
           .map((doc) => BookingRequest.fromJson(doc.data()))
           .toList();
       _isLoading = false;
@@ -282,7 +388,7 @@ class _CheckInPageState extends State<CheckInPage> {
       return;
     }
 
-    Navigator.push(
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EnterCodePage(
@@ -291,6 +397,40 @@ class _CheckInPageState extends State<CheckInPage> {
         ),
       ),
     );
+
+    // Làm mới danh sách sau khi nhập mã
+    if (result == true) {
+      await _fetchConfirmedBookings();
+    }
+  }
+
+  Future<void> _terminateBooking(BookingRequest booking) async {
+    final docId = '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
+    final docSnapshot = await FirebaseFirestore.instance
+        .collection('bookings')
+        .doc(docId)
+        .get();
+
+    if (!docSnapshot.exists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đặt phòng không tồn tại. Vui lòng thử lại.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    await FirebaseFirestore.instance.collection('bookings').doc(docId).delete();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Đã hủy đặt phòng thành công!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    await _fetchConfirmedBookings();
   }
 
   @override
@@ -327,7 +467,7 @@ class _CheckInPageState extends State<CheckInPage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _confirmedBookings.isEmpty
+          : _bookings.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -339,7 +479,7 @@ class _CheckInPageState extends State<CheckInPage> {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        'Không có đặt phòng nào đã được xác nhận.',
+                        'Không có đặt phòng nào để nhận phòng.',
                         style: TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 24),
@@ -363,9 +503,10 @@ class _CheckInPageState extends State<CheckInPage> {
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: _confirmedBookings.length,
+                  itemCount: _bookings.length,
                   itemBuilder: (context, index) {
-                    final booking = _confirmedBookings[index];
+                    final booking = _bookings[index];
+                    final isCheckedIn = booking.status == 'checked_in';
                     return Card(
                       elevation: 3,
                       margin: const EdgeInsets.only(bottom: 16),
@@ -407,12 +548,12 @@ class _CheckInPageState extends State<CheckInPage> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue,
+                                    color: isCheckedIn ? Colors.green : Colors.blue,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: const Text(
-                                    'Đã xác nhận',
-                                    style: TextStyle(
+                                  child: Text(
+                                    isCheckedIn ? 'Đã nhận phòng' : 'Đã xác nhận',
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -434,16 +575,29 @@ class _CheckInPageState extends State<CheckInPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
+                                if (!isCheckedIn) // Chỉ hiển thị nút nhận phòng nếu chưa checked_in
+                                  ElevatedButton(
+                                    onPressed: () => _handleCheckIn(booking),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text('Xác nhận nhận phòng'),
+                                  ),
+                                if (!isCheckedIn) const SizedBox(width: 8),
                                 ElevatedButton(
-                                  onPressed: () => _handleCheckIn(booking),
+                                  onPressed: () => _terminateBooking(booking),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: Colors.red,
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Xác nhận nhận phòng'),
+                                  child: const Text('Hủy'),
                                 ),
                               ],
                             ),
