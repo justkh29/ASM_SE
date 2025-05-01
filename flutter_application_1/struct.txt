@@ -1,0 +1,116 @@
+lib/
+│
+├── main.dart                              # Điểm khởi đầu ứng dụng
+├── firebase_options.dart                  # Cấu hình Firebase tự động tạo
+├── service_locator.dart                   # Quản lý phụ thuộc với GetIt
+│
+├── common/                                # Thành phần UI dùng chung
+│   └── widgets/
+│       ├── appbar/
+│       │   └── app_bar.dart               # AppBar tùy chỉnh
+│       └── buttons/
+│           └── basic_app_button.dart      # Nút tùy chỉnh
+│
+├── core/                                  # Core logic và configs
+│   ├── configs/
+│   │   ├── assets/
+│   │   │   ├── app_images.dart            # Đường dẫn hình ảnh
+│   │   │   └── app_vectors.dart           # Đường dẫn tới SVG
+│   │   └── theme/
+│   │       ├── app_colors.dart            # Định nghĩa màu sắc
+│   │       └── app_theme.dart             # Cấu hình theme
+│   └── usecase/
+│       └── usecase.dart                   # Interface cho các use case
+│
+├── data/                                  # Data layer
+│   ├── models/
+│   │   ├── auth/
+│   │   │   ├── create_user_req.dart       # Model đăng ký
+│   │   │   └── signin_user_req.dart       # Model đăng nhập
+│   │   └── booking/
+│   │       └── booking_request.dart       # Model đặt phòng
+│   │
+│   ├── repository/
+│   │   ├── auth/
+│   │   │   └── auth_repository_impl.dart  # Triển khai Auth Repository
+│   │   └── booking/
+│   │       └── booking_repository_impl.dart # Triển khai Booking Repository
+│   │
+│   └── sources/
+│       ├── auth/
+│       │   └── auth_firebase_service.dart # Tương tác Firebase Authentication
+│       └── booking/
+│           └── booking_firebase_service.dart # Tương tác Firebase cho đặt phòng
+│
+├── domain/                                # Domain layer
+│   ├── entities/
+│   │   └── auth/
+│   │       └── user.dart                  # Entity User
+│   │
+│   ├── repository/
+│   │   ├── auth/
+│   │   │   └── auth.dart                  # Interface Auth Repository
+│   │   └── booking/
+│   │       └── booking.dart               # Interface Booking Repository
+│   │
+│   └── usecases/
+│       ├── auth/
+│       │   ├── sigin.dart                 # Use case đăng nhập
+│       │   └── signup.dart                # Use case đăng ký
+│       └── booking/
+│           └── create_booking.dart        # Use case đặt phòng
+│
+└── presentation/                          # Presentation layer (UI)
+    ├── auth/
+    │   └── pages/
+    │       ├── signin.dart                # Màn hình đăng nhập
+    │       └── signup.dart                # Màn hình đăng ký
+    │
+    ├── booking/
+    │   └── pages/
+    │       ├── booking_page.dart          # Màn hình đặt phòng
+    │       ├── building_detail_page.dart  # Chi tiết tòa nhà
+    │       ├── floor_rooms_page.dart      # Danh sách phòng theo tầng
+    │       └── room_detail_page.dart      # Chi tiết phòng và form đặt phòng
+    │
+    ├── choose_mode/
+    │   └── pages/
+    │       └── choose_mode.dart           # Màn hình lựa chọn đăng nhập/đăng ký
+    │
+    ├── intro/
+    │   └── pages/
+    │       └── get_started.dart           # Màn hình giới thiệu
+    │
+    ├── root/
+    │   └── pages/
+    │       └── root.dart                  # Màn hình chính sau đăng nhập
+    │
+    └── splash/
+        └── pages/
+            └── splash.dart                # Màn hình khởi động
+
+assets/
+├── images/
+│   ├── hcmut_logo.png                    # Logo HCMUT
+│   ├── iconic_logo.png                   # Logo BK dạng icon
+│   ├── bottom_logo.png                   # Logo ở dưới
+│   ├── hcmut_start.png                   # Hình nền màn hình bắt đầu
+│   ├── logo_start.png                    # Logo khởi động
+│   ├── base_text.png                     # Text ở màn hình bắt đầu
+│   ├── booking_room.png                  # Hình ảnh đặt phòng cho menu
+│   ├── booking_history.png               # Hình ảnh lịch sử đặt
+│   ├── check_in.png                      # Hình ảnh nhận phòng
+│   ├── room_management.png               # Hình ảnh quản lý phòng
+│   └── profile_placeholder.png           # Ảnh đại diện mặc định
+│
+└── vectors/
+    ├── hcmut_logo.svg                    # Logo HCMUT dạng vector
+    └── account.svg                       # Icon tài khoản
+
+android/                                  # Cấu hình Android
+ios/                                      # Cấu hình iOS
+web/                                      # Cấu hình web
+pubspec.yaml                              # Cấu hình dependencies
+pubspec.lock                              # Lock file các phiên bản packages
+README.md                                 # Hướng dẫn dự án
+.gitignore                                # Cấu hình Git
