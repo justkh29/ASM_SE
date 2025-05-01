@@ -20,7 +20,7 @@
 // class _CheckInPageState extends State<CheckInPage> {
 //   final FirebaseAuth _auth = FirebaseAuth.instance;
 //   bool _isLoading = true;
-//   List<BookingRequest> _confirmedBookings = [];
+//   List<BookingRequest> _bookings = [];
 
 //   @override
 //   void initState() {
@@ -44,11 +44,11 @@
 //     final snapshot = await FirebaseFirestore.instance
 //         .collection('bookings')
 //         .where('userId', isEqualTo: currentUser.uid)
-//         .where('status', isEqualTo: 'confirmed')
+//         .where('status', whereIn: ['confirmed', 'checked_in'])
 //         .get();
 
 //     setState(() {
-//       _confirmedBookings = snapshot.docs
+//       _bookings = snapshot.docs
 //           .map((doc) => BookingRequest.fromJson(doc.data()))
 //           .toList();
 //       _isLoading = false;
@@ -66,7 +66,7 @@
 //       return;
 //     }
 
-//     Navigator.push(
+//     final result = await Navigator.push(
 //       context,
 //       MaterialPageRoute(
 //         builder: (context) => EnterCodePage(
@@ -75,6 +75,43 @@
 //         ),
 //       ),
 //     );
+
+//     if (result == true) {
+//       await _fetchConfirmedBookings();
+//     }
+//   }
+
+//   Future<void> _terminateBooking(BookingRequest booking) async {
+//     final docId = '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
+//     final docSnapshot = await FirebaseFirestore.instance
+//         .collection('bookings')
+//         .doc(docId)
+//         .get();
+
+//     if (!docSnapshot.exists) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Đặt phòng không tồn tại. Vui lòng thử lại.'),
+//           backgroundColor: Colors.red,
+//         ),
+//       );
+//       return;
+//     }
+
+//     // Cập nhật trạng thái thành 'available' thay vì xóa
+//     await FirebaseFirestore.instance.collection('bookings').doc(docId).update({
+//       'status': 'available',
+//       'checkInCode': FieldValue.delete(), // Xóa mã nhận phòng nếu có
+//     });
+
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(
+//         content: Text('Đã hủy đặt phòng thành công!'),
+//         backgroundColor: Colors.green,
+//       ),
+//     );
+
+//     await _fetchConfirmedBookings();
 //   }
 
 //   @override
@@ -111,7 +148,7 @@
 //       ),
 //       body: _isLoading
 //           ? const Center(child: CircularProgressIndicator())
-//           : _confirmedBookings.isEmpty
+//           : _bookings.isEmpty
 //               ? Center(
 //                   child: Column(
 //                     mainAxisAlignment: MainAxisAlignment.center,
@@ -123,7 +160,7 @@
 //                       ),
 //                       const SizedBox(height: 16),
 //                       const Text(
-//                         'Không có đặt phòng nào đã được xác nhận.',
+//                         'Không có đặt phòng nào để nhận phòng.',
 //                         style: TextStyle(fontSize: 16),
 //                       ),
 //                       const SizedBox(height: 24),
@@ -147,9 +184,10 @@
 //                 )
 //               : ListView.builder(
 //                   padding: const EdgeInsets.all(16),
-//                   itemCount: _confirmedBookings.length,
+//                   itemCount: _bookings.length,
 //                   itemBuilder: (context, index) {
-//                     final booking = _confirmedBookings[index];
+//                     final booking = _bookings[index];
+//                     final isCheckedIn = booking.status == 'checked_in';
 //                     return Card(
 //                       elevation: 3,
 //                       margin: const EdgeInsets.only(bottom: 16),
@@ -191,12 +229,12 @@
 //                                   padding: const EdgeInsets.symmetric(
 //                                       horizontal: 8, vertical: 4),
 //                                   decoration: BoxDecoration(
-//                                     color: Colors.blue,
+//                                     color: isCheckedIn ? Colors.green : Colors.blue,
 //                                     borderRadius: BorderRadius.circular(4),
 //                                   ),
-//                                   child: const Text(
-//                                     'Đã xác nhận',
-//                                     style: TextStyle(
+//                                   child: Text(
+//                                     isCheckedIn ? 'Đã nhận phòng' : 'Đã xác nhận',
+//                                     style: const TextStyle(
 //                                       color: Colors.white,
 //                                       fontSize: 12,
 //                                       fontWeight: FontWeight.bold,
@@ -218,16 +256,29 @@
 //                             Row(
 //                               mainAxisAlignment: MainAxisAlignment.end,
 //                               children: [
+//                                 if (!isCheckedIn)
+//                                   ElevatedButton(
+//                                     onPressed: () => _handleCheckIn(booking),
+//                                     style: ElevatedButton.styleFrom(
+//                                       backgroundColor: Colors.green,
+//                                       foregroundColor: Colors.white,
+//                                       shape: RoundedRectangleBorder(
+//                                         borderRadius: BorderRadius.circular(8),
+//                                       ),
+//                                     ),
+//                                     child: const Text('Xác nhận nhận phòng'),
+//                                   ),
+//                                 if (!isCheckedIn) const SizedBox(width: 8),
 //                                 ElevatedButton(
-//                                   onPressed: () => _handleCheckIn(booking),
+//                                   onPressed: () => _terminateBooking(booking),
 //                                   style: ElevatedButton.styleFrom(
-//                                     backgroundColor: Colors.green,
+//                                     backgroundColor: Colors.red,
 //                                     foregroundColor: Colors.white,
 //                                     shape: RoundedRectangleBorder(
 //                                       borderRadius: BorderRadius.circular(8),
 //                                     ),
 //                                   ),
-//                                   child: const Text('Xác nhận nhận phòng'),
+//                                   child: const Text('Thoát'),
 //                                 ),
 //                               ],
 //                             ),
@@ -366,7 +417,7 @@ class _CheckInPageState extends State<CheckInPage> {
     final snapshot = await FirebaseFirestore.instance
         .collection('bookings')
         .where('userId', isEqualTo: currentUser.uid)
-        .where('status', whereIn: ['confirmed', 'checked_in']) // Lấy cả confirmed và checked_in
+        .where('status', whereIn: ['confirmed', 'checked_in'])
         .get();
 
     setState(() {
@@ -398,7 +449,6 @@ class _CheckInPageState extends State<CheckInPage> {
       ),
     );
 
-    // Làm mới danh sách sau khi nhập mã
     if (result == true) {
       await _fetchConfirmedBookings();
     }
@@ -406,12 +456,15 @@ class _CheckInPageState extends State<CheckInPage> {
 
   Future<void> _terminateBooking(BookingRequest booking) async {
     final docId = '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
-    final docSnapshot = await FirebaseFirestore.instance
+    final roomDocId = '${booking.buildingCode}_${booking.roomNumber.replaceAll('.', '_')}';
+
+    // Kiểm tra xem booking có tồn tại không
+    final bookingSnapshot = await FirebaseFirestore.instance
         .collection('bookings')
         .doc(docId)
         .get();
 
-    if (!docSnapshot.exists) {
+    if (!bookingSnapshot.exists) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Đặt phòng không tồn tại. Vui lòng thử lại.'),
@@ -421,7 +474,32 @@ class _CheckInPageState extends State<CheckInPage> {
       return;
     }
 
-    await FirebaseFirestore.instance.collection('bookings').doc(docId).delete();
+    // Kiểm tra xem phòng có tồn tại không
+    final roomSnapshot = await FirebaseFirestore.instance
+        .collection('rooms')
+        .doc(roomDocId)
+        .get();
+
+    if (!roomSnapshot.exists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Phòng không tồn tại. Vui lòng thử lại.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Cập nhật trạng thái booking thành 'available' và xóa mã nhận phòng
+    await FirebaseFirestore.instance.collection('bookings').doc(docId).update({
+      'status': 'available',
+      'checkInCode': FieldValue.delete(),
+    });
+
+    // Cập nhật trạng thái phòng thành 'available'
+    await FirebaseFirestore.instance.collection('rooms').doc(roomDocId).update({
+      'status': 'available',
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -575,7 +653,7 @@ class _CheckInPageState extends State<CheckInPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                if (!isCheckedIn) // Chỉ hiển thị nút nhận phòng nếu chưa checked_in
+                                if (!isCheckedIn)
                                   ElevatedButton(
                                     onPressed: () => _handleCheckIn(booking),
                                     style: ElevatedButton.styleFrom(
@@ -597,7 +675,7 @@ class _CheckInPageState extends State<CheckInPage> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Hủy'),
+                                  child: const Text('Thoát'),
                                 ),
                               ],
                             ),

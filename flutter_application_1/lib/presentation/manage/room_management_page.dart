@@ -1,10 +1,12 @@
+/// TOI THOI GIAN TU HUY PHONG
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/configs/theme/app_colors.dart';
 import 'package:flutter_application_1/data/models/booking/booking_request.dart';
 import 'package:flutter_application_1/domain/usecases/booking/get_bookings.dart';
 import 'package:flutter_application_1/domain/usecases/booking/update_booking.dart';
-import 'package:flutter_application_1/domain/usecases/booking/delete_booking.dart';
 import 'package:flutter_application_1/presentation/root/pages/root.dart';
 import 'package:flutter_application_1/presentation/root/pages/notifications_page.dart';
 import 'package:flutter_application_1/presentation/root/pages/account_page.dart';
@@ -54,14 +56,18 @@ class _RoomManagementPageState extends State<RoomManagementPage> {
         });
       },
       (bookings) async {
-        // Kiểm tra và tự động terminate các booking hết giờ
+        // Kiểm tra và xóa các booking có trạng thái 'available'
         for (var booking in bookings) {
-          if (await _isBookingExpired(booking)) {
+          if (booking.status == 'available') {
+            await _deleteBooking(booking);
+          }
+          // Kiểm tra và tự động terminate các booking hết giờ
+          else if (await _isBookingExpired(booking)) {
             await _terminateBooking(booking, auto: true);
           }
         }
 
-        // Lọc lại danh sách sau khi terminate
+        // Lọc lại danh sách sau khi xóa và terminate
         final updatedResult = await sl<GetBookingsUseCase>().call(null);
         updatedResult.fold(
           (error) {
@@ -72,13 +78,26 @@ class _RoomManagementPageState extends State<RoomManagementPage> {
           },
           (updatedBookings) {
             setState(() {
-              _bookings = updatedBookings;
+              _bookings = updatedBookings.where((booking) => booking.status != 'available').toList();
               _isLoading = false;
             });
           },
         );
       },
     );
+  }
+
+  // Xóa booking khỏi Firestore
+  Future<void> _deleteBooking(BookingRequest booking) async {
+    final docId = '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
+    final docSnapshot = await FirebaseFirestore.instance
+        .collection('bookings')
+        .doc(docId)
+        .get();
+
+    if (docSnapshot.exists) {
+      await FirebaseFirestore.instance.collection('bookings').doc(docId).delete();
+    }
   }
 
   // Kiểm tra xem booking có hết giờ hay không
@@ -134,10 +153,11 @@ class _RoomManagementPageState extends State<RoomManagementPage> {
                       .toLowerCase()
                       .contains(_buildingController.text.toLowerCase());
               bool matchesDate = _selectedDate == null ||
-                  booking.bookingDate.day == _selectedDate!.day &&
+                  (booking.bookingDate.day == _selectedDate!.day &&
                       booking.bookingDate.month == _selectedDate!.month &&
-                      booking.bookingDate.year == _selectedDate!.year;
-              return matchesBuilding && matchesDate;
+                      booking.bookingDate.year == _selectedDate!.year);
+              bool isNotAvailable = booking.status != 'available';
+              return matchesBuilding && matchesDate && isNotAvailable;
             }).toList();
             _isLoading = false;
           });
@@ -280,6 +300,8 @@ class _RoomManagementPageState extends State<RoomManagementPage> {
 
   Future<void> _terminateBooking(BookingRequest booking, {bool auto = false}) async {
     final docId = '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
+    final roomDocId = '${booking.buildingCode}_${booking.roomNumber.replaceAll('.', '_')}';
+
     final docSnapshot = await FirebaseFirestore.instance
         .collection('bookings')
         .doc(docId)
@@ -297,29 +319,31 @@ class _RoomManagementPageState extends State<RoomManagementPage> {
       return;
     }
 
-    final result = await sl<DeleteBookingUseCase>().call(booking);
+    // Xóa booking trực tiếp thay vì sử dụng DeleteBookingUseCase
+    await FirebaseFirestore.instance.collection('bookings').doc(docId).delete();
 
-    result.fold(
-      (error) {
-        if (!auto) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi kết thúc: $error')),
-          );
-        }
-      },
-      (_) async {
-        if (!auto) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kết thúc đặt phòng thành công!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          await Future.delayed(const Duration(seconds: 2));
-        }
-        await _fetchBookings();
-      },
-    );
+    // Cập nhật trạng thái phòng thành 'available'
+    final roomSnapshot = await FirebaseFirestore.instance
+        .collection('rooms')
+        .doc(roomDocId)
+        .get();
+
+    if (roomSnapshot.exists) {
+      await FirebaseFirestore.instance.collection('rooms').doc(roomDocId).update({
+        'status': 'available',
+      });
+    }
+
+    if (!auto) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Kết thúc đặt phòng thành công!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    await _fetchBookings();
   }
 
   Color _getStatusColor(String status) {
@@ -352,7 +376,7 @@ class _RoomManagementPageState extends State<RoomManagementPage> {
       case 'cancelled':
         return 'Đã hủy';
       default:
-        return 'Không xác định';
+        return 'Đã thoát phòng';
     }
   }
 
@@ -542,12 +566,17 @@ class _RoomManagementPageState extends State<RoomManagementPage> {
                           children: const [
                             StatusIndicator(
                               color: Colors.green,
-                              text: 'Đã xác nhận',
+                              text: 'Đã nhận phòng',
                             ),
                             SizedBox(width: 10),
                             StatusIndicator(
                               color: Colors.orange,
                               text: 'Chưa xác nhận',
+                            ),
+                            SizedBox(width: 10),
+                            StatusIndicator(
+                              color: Colors.blue,
+                              text: 'Đã xác nhận',
                             ),
                           ],
                         ),
