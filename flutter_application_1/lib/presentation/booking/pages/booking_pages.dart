@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/configs/theme/app_colors.dart';
 import 'package:flutter_application_1/core/configs/assets/app_images.dart';
@@ -26,7 +25,7 @@ class _BookingPageState extends State<BookingPage> {
   bool _showResults = false;
   bool _isLoading = true;
   String _errorMessage = '';
-  
+
   List<Building> _buildings = [];
 
   @override
@@ -41,7 +40,7 @@ class _BookingPageState extends State<BookingPage> {
     });
 
     final result = await sl<GetBuildingsUseCase>().call(null);
-    
+
     result.fold(
       (error) {
         setState(() {
@@ -106,14 +105,14 @@ class _BookingPageState extends State<BookingPage> {
       );
       return;
     }
-    
+
     if (_selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Vui lòng chọn thời gian')),
       );
       return;
     }
-    
+
     if (_peopleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Vui lòng nhập số người')),
@@ -135,12 +134,12 @@ class _BookingPageState extends State<BookingPage> {
       );
       return;
     }
-    
+
     setState(() {
       _showResults = true;
     });
   }
-  
+
   void _onBuildingTap(String buildingCode) {
     Navigator.push(
       context,
@@ -179,7 +178,8 @@ class _BookingPageState extends State<BookingPage> {
           ),
           CircleAvatar(
             radius: 16,
-            backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+            backgroundImage:
+                AssetImage('assets/images/profile_placeholder.png'),
           ),
           const SizedBox(width: 10),
         ],
@@ -216,7 +216,8 @@ class _BookingPageState extends State<BookingPage> {
                                     icon: Icons.calendar_today,
                                     hint: 'Ngày đến',
                                     value: _selectedDate != null
-                                        ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+                                        ? DateFormat('dd/MM/yyyy')
+                                            .format(_selectedDate!)
                                         : null,
                                     onTap: () => _selectDate(context),
                                   ),
@@ -269,21 +270,29 @@ class _BookingPageState extends State<BookingPage> {
                                               const SizedBox(height: 16),
                                               Expanded(
                                                 child: ListView.builder(
-                                                  scrollDirection: Axis.horizontal,
+                                                  scrollDirection:
+                                                      Axis.horizontal,
                                                   itemCount: 8,
-                                                  itemBuilder: (context, index) {
+                                                  itemBuilder:
+                                                      (context, index) {
                                                     final duration = index + 1;
                                                     return Padding(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8),
                                                       child: ChoiceChip(
-                                                        label: Text('$duration giờ'),
-                                                        selected: _duration == duration,
+                                                        label: Text(
+                                                            '$duration giờ'),
+                                                        selected: _duration ==
+                                                            duration,
                                                         onSelected: (selected) {
                                                           if (selected) {
                                                             setState(() {
-                                                              _duration = duration;
+                                                              _duration =
+                                                                  duration;
                                                             });
-                                                            Navigator.pop(context);
+                                                            Navigator.pop(
+                                                                context);
                                                           }
                                                         },
                                                       ),
@@ -309,7 +318,8 @@ class _BookingPageState extends State<BookingPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.amber,
                           foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -347,7 +357,8 @@ class _BookingPageState extends State<BookingPage> {
                               GridView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
                                   crossAxisSpacing: 15,
                                   mainAxisSpacing: 15,
@@ -356,9 +367,10 @@ class _BookingPageState extends State<BookingPage> {
                                 itemCount: _buildings.length,
                                 itemBuilder: (context, index) {
                                   final building = _buildings[index];
-                                  
+
                                   return GestureDetector(
-                                    onTap: () => _onBuildingTap(building.buildingCode),
+                                    onTap: () =>
+                                        _onBuildingTap(building.buildingCode),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: Colors.amber,
@@ -374,7 +386,8 @@ class _BookingPageState extends State<BookingPage> {
                                       ),
                                       alignment: Alignment.center,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             building.buildingCode,
@@ -468,4 +481,3 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 }
-

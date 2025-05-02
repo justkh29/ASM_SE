@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "802213364546",
-    "project_id": "btl-test-ea331",
-    "storage_bucket": "btl-test-ea331.firebasestorage.app"
+    "project_number": "676439085609",
+    "project_id": "hcmut-app",
+    "storage_bucket": "hcmut-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:802213364546:android:a575a9d4387ce3f0d53edb",
+        "mobilesdk_app_id": "1:676439085609:android:5780249c562b83cb13c238",
         "android_client_info": {
           "package_name": "com.example.flutter_application_1"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDPjpuCW4pr2SwoBFJ7gH9g8wpxk58cAsQ"
+          "current_key": "AIzaSyBMl0pBaFgSTj-qsTjG2ZlwJQr0F9a6GT4"
         }
       ],
       "services": {

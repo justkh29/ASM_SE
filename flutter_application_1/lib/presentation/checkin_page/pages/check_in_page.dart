@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/configs/theme/app_colors.dart';
 import 'package:flutter_application_1/data/models/booking/booking_request.dart';
+import 'package:flutter_application_1/presentation/booking/pages/booking_pages.dart';
 import 'package:flutter_application_1/presentation/root/pages/root.dart';
 import 'package:flutter_application_1/presentation/root/pages/notifications_page.dart';
 import 'package:flutter_application_1/presentation/root/pages/account_page.dart';
@@ -44,8 +45,7 @@ class _CheckInPageState extends State<CheckInPage> {
     final snapshot = await FirebaseFirestore.instance
         .collection('bookings')
         .where('userId', isEqualTo: currentUser.uid)
-        .where('status', whereIn: ['confirmed', 'checked_in'])
-        .get();
+        .where('status', whereIn: ['confirmed', 'checked_in']).get();
 
     setState(() {
       _bookings = snapshot.docs
@@ -59,7 +59,8 @@ class _CheckInPageState extends State<CheckInPage> {
     if (booking.checkInCode == null || booking.checkInCode!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Không tìm thấy mã nhận phòng. Vui lòng liên hệ quản lý.'),
+          content:
+              Text('Không tìm thấy mã nhận phòng. Vui lòng liên hệ quản lý.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -82,8 +83,10 @@ class _CheckInPageState extends State<CheckInPage> {
   }
 
   Future<void> _terminateBooking(BookingRequest booking) async {
-    final docId = '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
-    final roomDocId = '${booking.buildingCode}_${booking.roomNumber.replaceAll('.', '_')}';
+    final docId =
+        '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
+    final roomDocId =
+        '${booking.buildingCode}_${booking.roomNumber.replaceAll('.', '_')}';
 
     // Kiểm tra xem booking có tồn tại không
     final bookingSnapshot = await FirebaseFirestore.instance
@@ -159,13 +162,15 @@ class _CheckInPageState extends State<CheckInPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                MaterialPageRoute(
+                    builder: (context) => const NotificationsPage()),
               );
             },
           ),
           const CircleAvatar(
             radius: 16,
-            backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+            backgroundImage:
+                AssetImage('assets/images/profile_placeholder.png'),
           ),
           const SizedBox(width: 10),
         ],
@@ -198,7 +203,8 @@ class _CheckInPageState extends State<CheckInPage> {
                         onPressed: () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const RootPage()),
+                            MaterialPageRoute(
+                                builder: (context) => const BookingPage()),
                           );
                         },
                         child: const Text('Đặt phòng ngay'),
@@ -253,11 +259,15 @@ class _CheckInPageState extends State<CheckInPage> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: isCheckedIn ? Colors.green : Colors.blue,
+                                    color: isCheckedIn
+                                        ? Colors.green
+                                        : Colors.blue,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
-                                    isCheckedIn ? 'Đã nhận phòng' : 'Đã xác nhận',
+                                    isCheckedIn
+                                        ? 'Đã nhận phòng'
+                                        : 'Đã xác nhận',
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 12,
@@ -270,15 +280,19 @@ class _CheckInPageState extends State<CheckInPage> {
                             const SizedBox(height: 12),
                             const Divider(),
                             const SizedBox(height: 8),
-                            _buildInfoRow('Ngày:',
-                                DateFormat('dd/MM/yyyy').format(booking.bookingDate)),
+                            _buildInfoRow(
+                                'Ngày:',
+                                DateFormat('dd/MM/yyyy')
+                                    .format(booking.bookingDate)),
                             _buildInfoRow('Thời gian:',
                                 '${booking.startTime.format(context)} - ${booking.endTime.format(context)}'),
-                            _buildInfoRow('Thời lượng:', '${booking.duration} giờ'),
-                            _buildInfoRow('Số người:', '${booking.numberOfPeople}'),
+                            _buildInfoRow(
+                                'Thời lượng:', '${booking.duration} giờ'),
+                            _buildInfoRow(
+                                'Số người:', '${booking.numberOfPeople}'),
                             const SizedBox(height: 16),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 if (!isCheckedIn)
                                   ElevatedButton(
@@ -290,7 +304,11 @@ class _CheckInPageState extends State<CheckInPage> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                     ),
-                                    child: const Text('Xác nhận nhận phòng'),
+                                    child: const Text(
+                                      'Xác nhận nhận phòng',
+                                      style: TextStyle(fontSize: 18),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 if (!isCheckedIn) const SizedBox(width: 8),
                                 ElevatedButton(
@@ -302,7 +320,11 @@ class _CheckInPageState extends State<CheckInPage> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Thoát'),
+                                  child: const Text(
+                                    'Thoát',
+                                    style: TextStyle(fontSize: 18),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ],
                             ),
@@ -328,7 +350,8 @@ class _CheckInPageState extends State<CheckInPage> {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                MaterialPageRoute(
+                    builder: (context) => const NotificationsPage()),
               );
               break;
             case 2:

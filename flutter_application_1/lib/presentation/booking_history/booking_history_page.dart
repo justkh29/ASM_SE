@@ -19,17 +19,18 @@ class BookingHistoryPage extends StatefulWidget {
 class _BookingHistoryPageState extends State<BookingHistoryPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   Stream<List<BookingRequest>>? _bookingsStream;
-  
+
   @override
   void initState() {
     super.initState();
     _initBookingsStream();
   }
-  
+
   void _initBookingsStream() {
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
-      _bookingsStream = sl<BookingRepository>().streamUserBookings(currentUser.uid);
+      _bookingsStream =
+          sl<BookingRepository>().streamUserBookings(currentUser.uid);
     }
   }
 
@@ -54,7 +55,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
           : _buildBookingsList(),
     );
   }
-  
+
   Widget _buildNotLoggedIn() {
     return Center(
       child: Column(
@@ -91,7 +92,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
       ),
     );
   }
-  
+
   Widget _buildBookingsList() {
     return StreamBuilder<List<BookingRequest>>(
       stream: _bookingsStream,
@@ -99,7 +100,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
-        
+
         if (snapshot.hasError) {
           return Center(
             child: Column(
@@ -121,9 +122,9 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
             ),
           );
         }
-        
+
         final bookings = snapshot.data ?? [];
-        
+
         if (bookings.isEmpty) {
           return Center(
             child: Column(
@@ -154,13 +155,13 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
             ),
           );
         }
-        
+
         return ListView.builder(
           padding: EdgeInsets.all(16),
           itemCount: bookings.length,
           itemBuilder: (context, index) {
             final booking = bookings[index];
-            
+
             return Card(
               elevation: 3,
               margin: EdgeInsets.only(bottom: 16),
@@ -179,7 +180,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
                     Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.amber,
                             borderRadius: BorderRadius.circular(20),
@@ -201,7 +203,8 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
                         ),
                         Spacer(),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: _getStatusColor(booking.status ?? 'pending'),
                             borderRadius: BorderRadius.circular(4),
@@ -220,8 +223,10 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
                     SizedBox(height: 12),
                     Divider(),
                     SizedBox(height: 8),
-                    _buildInfoRow('Ngày:', DateFormat('dd/MM/yyyy').format(booking.bookingDate)),
-                    _buildInfoRow('Thời gian:', '${booking.startTime.format(context)} - ${booking.endTime.format(context)}'),
+                    _buildInfoRow('Ngày:',
+                        DateFormat('dd/MM/yyyy').format(booking.bookingDate)),
+                    _buildInfoRow('Thời gian:',
+                        '${booking.startTime.format(context)} - ${booking.endTime.format(context)}'),
                     _buildInfoRow('Thời lượng:', '${booking.duration} giờ'),
                     _buildInfoRow('Số người:', '${booking.numberOfPeople}'),
                     SizedBox(height: 16),
@@ -258,7 +263,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
       },
     );
   }
-  
+
   Widget _buildInfoRow(String label, String value, [Color? valueColor]) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -303,15 +308,26 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
               _buildInfoRow('Tòa:', booking.buildingCode),
               _buildInfoRow('Phòng:', booking.roomNumber),
               _buildInfoRow('Tầng:', '${booking.floor}'),
-              _buildInfoRow('Trạng thái:', _getStatusText(booking.status ?? 'pending'), _getStatusColor(booking.status ?? 'pending')),
-              _buildInfoRow('Ngày đặt:', DateFormat('dd/MM/yyyy').format(booking.bookingDate)),
-              _buildInfoRow('Thời gian:', '${booking.startTime.format(context)} - ${booking.endTime.format(context)}'),
+              _buildInfoRow(
+                  'Trạng thái:',
+                  _getStatusText(booking.status ?? 'pending'),
+                  _getStatusColor(booking.status ?? 'pending')),
+              _buildInfoRow('Ngày đặt:',
+                  DateFormat('dd/MM/yyyy').format(booking.bookingDate)),
+              _buildInfoRow('Thời gian:',
+                  '${booking.startTime.format(context)} - ${booking.endTime.format(context)}'),
               _buildInfoRow('Thời lượng:', '${booking.duration} giờ'),
               _buildInfoRow('Số người:', '${booking.numberOfPeople}'),
-              _buildInfoRow('Ngày tạo:', booking.createdAt != null ? DateFormat('dd/MM/yyyy HH:mm').format(booking.createdAt!) : 'Không có dữ liệu'),
+              _buildInfoRow(
+                  'Ngày tạo:',
+                  booking.createdAt != null
+                      ? DateFormat('dd/MM/yyyy HH:mm')
+                          .format(booking.createdAt!)
+                      : 'Không có dữ liệu'),
               _buildInfoRow('Người đặt:', userDisplay),
               if (booking.status != 'pending')
-                _buildInfoRow('Mã nhận phòng:', booking.checkInCode ?? 'Chưa có mã'),
+                _buildInfoRow(
+                    'Mã nhận phòng:', booking.checkInCode ?? 'Chưa có mã'),
             ],
           ),
         ),
@@ -324,7 +340,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
       ),
     );
   }
-  
+
   Color _getStatusColor(String status) {
     switch (status) {
       case 'pending':
@@ -343,7 +359,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
         return Colors.grey;
     }
   }
-  
+
   String _getStatusText(String status) {
     switch (status) {
       case 'pending':
@@ -362,17 +378,18 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
         return 'Không xác định';
     }
   }
-  
+
   bool _canCancel(String status) {
     return status == 'pending' || status == 'confirmed';
   }
-  
+
   Future<void> _showCancelDialog(BookingRequest booking) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Xác nhận hủy đặt phòng'),
-        content: Text('Bạn có chắc chắn muốn hủy đặt phòng ${booking.roomNumber} vào ngày ${DateFormat('dd/MM/yyyy').format(booking.bookingDate)}?'),
+        content: Text(
+            'Bạn có chắc chắn muốn hủy đặt phòng ${booking.roomNumber} vào ngày ${DateFormat('dd/MM/yyyy').format(booking.bookingDate)}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -388,10 +405,12 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
         ],
       ),
     );
-    
+
     if (confirmed == true) {
-      final docId = '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
-      final roomDocId = '${booking.buildingCode}_${booking.roomNumber.replaceAll('.', '_')}';
+      final docId =
+          '${booking.userId}_${booking.roomNumber}_${booking.bookingDate.toIso8601String()}';
+      final roomDocId =
+          '${booking.buildingCode}_${booking.roomNumber.replaceAll('.', '_')}';
       final docSnapshot = await FirebaseFirestore.instance
           .collection('bookings')
           .doc(docId)
@@ -408,7 +427,10 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
       }
 
       // Cập nhật trạng thái thành 'available' thay vì 'cancelled'
-      await FirebaseFirestore.instance.collection('bookings').doc(docId).update({
+      await FirebaseFirestore.instance
+          .collection('bookings')
+          .doc(docId)
+          .update({
         'status': 'available',
         'checkInCode': FieldValue.delete(), // Xóa mã nhận phòng nếu có
       });
@@ -420,7 +442,10 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
           .get();
 
       if (roomSnapshot.exists) {
-        await FirebaseFirestore.instance.collection('rooms').doc(roomDocId).update({
+        await FirebaseFirestore.instance
+            .collection('rooms')
+            .doc(roomDocId)
+            .update({
           'status': 'available',
         });
       }
