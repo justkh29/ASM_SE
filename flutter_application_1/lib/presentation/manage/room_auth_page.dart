@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/configs/theme/app_colors.dart';
 import 'package:flutter_application_1/presentation/root/pages/root.dart';
@@ -5,7 +6,7 @@ import 'room_management_page.dart';
 import 'package:flutter_application_1/presentation/root/pages/notifications_page.dart';
 import 'package:flutter_application_1/presentation/root/pages/account_page.dart';
 import 'package:flutter_application_1/presentation/root/pages/settings_page.dart';
-
+import 'package:flutter_application_1/presentation/choose_mode/pages/choose_mode.dart';
 
 class RoomAuthPage extends StatefulWidget {
   const RoomAuthPage({super.key});
@@ -18,6 +19,7 @@ class _RoomAuthPageState extends State<RoomAuthPage> {
   final TextEditingController _codeController = TextEditingController();
   bool _isAuthenticated = false;
   int _selectedIndex = 0;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void _authenticate() {
     if (_codeController.text == 'HCMUT2025') {
@@ -74,8 +76,46 @@ class _RoomAuthPageState extends State<RoomAuthPage> {
     super.dispose();
   }
 
+  Widget _buildNotLoggedIn() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.lock,
+            size: 64,
+            color: Colors.grey,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Vui lòng đăng nhập để sử dụng chức năng này',
+            style: TextStyle(fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            },
+            child: const Text('Đăng nhập'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = _auth.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
@@ -106,74 +146,76 @@ class _RoomAuthPageState extends State<RoomAuthPage> {
           const SizedBox(width: 10),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/zalo.png',
-                  height: 150,
-                  width: 150,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Quét mã QR để đăng nhập\nmục Quản lý phòng',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _codeController,
-                  decoration: InputDecoration(
-                    labelText: 'Nhập mã xác nhận:',
-                    border: const OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _authenticate,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 15,
-                    ),
-                  ),
-                  child: const Text(
-                    'Xác nhận',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                if (_isAuthenticated)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(15),
+      body: currentUser == null
+          ? _buildNotLoggedIn()
+          : SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/zalo.png',
+                        height: 150,
+                        width: 150,
                       ),
-                      child: const Text(
-                        'Xác nhận thành công\nvào quản lí phòng để\ntiến hành sử dụng',
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Quét mã QR để đăng nhập\nmục Quản lý phòng',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _codeController,
+                        decoration: InputDecoration(
+                          labelText: 'Nhập mã xác nhận:',
+                          border: const OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _authenticate,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 15,
+                          ),
+                        ),
+                        child: const Text(
+                          'Xác nhận',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      if (_isAuthenticated)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Container(
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: const Text(
+                              'Xác nhận thành công\nvào quản lí phòng để\ntiến hành sử dụng',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-              ],
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: AppColors.primary,
