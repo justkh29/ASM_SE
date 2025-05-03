@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/configs/theme/app_colors.dart';
 import 'package:flutter_application_1/data/models/booking/booking_request.dart';
 import 'package:flutter_application_1/domain/repository/booking/booking.dart';
+import 'package:flutter_application_1/presentation/booking/pages/booking_pages.dart';
 import 'package:flutter_application_1/presentation/root/pages/root.dart';
 import 'package:flutter_application_1/service_locator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -146,7 +147,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => RootPage()),
+                      MaterialPageRoute(builder: (context) => BookingPage()),
                     );
                   },
                   child: Text('Đặt phòng ngay'),
