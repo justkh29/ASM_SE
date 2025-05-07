@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/configs/theme/app_colors.dart';
 import 'package:flutter_application_1/data/models/booking/booking_request.dart';
 import 'package:flutter_application_1/presentation/root/pages/root.dart';
-import 'package:intl/intl.dart'; // Thêm import này
+import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class EnterCodePage extends StatefulWidget {
   final BookingRequest booking;
@@ -90,112 +91,146 @@ class _EnterCodePageState extends State<EnterCodePage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: Colors.blue, width: 1),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+          : SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height -
+                      AppBar().preferredSize.height -
+                      MediaQuery.of(context).padding.top -
+                      kBottomNavigationBarHeight, // Điều chỉnh chiều cao tối đa
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Card(
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side:
+                                const BorderSide(color: Colors.blue, width: 1),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    widget.booking.roomNumber,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        widget.booking.roomNumber,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Tòa ${widget.booking.buildingCode}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'Tòa ${widget.booking.buildingCode}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                                const SizedBox(height: 12),
+                                const Divider(),
+                                const SizedBox(height: 8),
+                                _buildInfoRow(
+                                    'Ngày:',
+                                    DateFormat('dd/MM/yyyy')
+                                        .format(widget.booking.bookingDate)),
+                                _buildInfoRow('Thời gian:',
+                                    '${widget.booking.startTime.format(context)} - ${widget.booking.endTime.format(context)}'),
+                                _buildInfoRow('Thời lượng:',
+                                    '${widget.booking.duration} giờ'),
+                                _buildInfoRow('Số người:',
+                                    '${widget.booking.numberOfPeople}'),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            const Divider(),
-                            const SizedBox(height: 8),
-                            _buildInfoRow('Ngày:', DateFormat('dd/MM/yyyy')
-                                .format(widget.booking.bookingDate)),
-                            _buildInfoRow('Thời gian:',
-                                '${widget.booking.startTime.format(context)} - ${widget.booking.endTime.format(context)}'),
-                            _buildInfoRow(
-                                'Thời lượng:', '${widget.booking.duration} giờ'),
-                            _buildInfoRow(
-                                'Số người:', '${widget.booking.numberOfPeople}'),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Vui lòng nhập mã nhận phòng:',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _codeController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        labelText: 'Mã nhận phòng (5 ký tự)',
-                        labelStyle: const TextStyle(color: Colors.grey),
-                        errorText:
-                            _errorMessage.isNotEmpty ? _errorMessage : null,
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.primary),
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Quét mã QR để nhận mã nhận phòng:',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: QrImageView(
+                          data: widget.correctCode,
+                          version: QrVersions.auto,
+                          size: 150.0,
+                          backgroundColor: Colors.white,
+                          padding: const EdgeInsets.all(10),
+                          errorCorrectionLevel: QrErrorCorrectLevel.L,
                         ),
                       ),
-                      maxLength: 5,
-                      textCapitalization: TextCapitalization.characters,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 24),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: _verifyCode,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 16),
-                          shape: RoundedRectangleBorder(
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Nhập mã nhận phòng:',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _codeController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          elevation: 3,
+                          labelText: 'Mã nhận phòng (5 ký tự)',
+                          labelStyle: const TextStyle(color: Colors.grey),
+                          errorText:
+                              _errorMessage.isNotEmpty ? _errorMessage : null,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: AppColors.primary),
+                          ),
                         ),
-                        child: const Text(
-                          'Xác nhận',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                        maxLength: 5,
+                        textCapitalization: TextCapitalization.characters,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 24),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: _verifyCode,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 40, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation: 3,
+                          ),
+                          child: const Text(
+                            'Xác nhận',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -222,6 +257,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
                 fontWeight: FontWeight.bold,
                 color: valueColor ?? Colors.black,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
